@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from'../contexts/AuthContenxt';
+import { useAuth } from '../contexts/AuthContext';
 import {
   LayoutDashboard, Users, BookOpen, ClipboardCheck, GraduationCap,
   Calendar, Clock, Megaphone, CalendarDays, LogOut, Menu, X, School,
