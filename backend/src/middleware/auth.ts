@@ -4,6 +4,11 @@ import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET || 'school-mgmt-secret-key-change-in-production';
 
 export interface AuthRequest extends Request {
+  // Ensure `body` is available on the request for handlers that read req.body
+  body?: any;
+  // Ensure `headers` is available for middleware that reads authorization headers
+  headers?: any;
+
   user?: {
     id: string;
     email: string;
