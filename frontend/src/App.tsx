@@ -10,7 +10,7 @@ import GradesPage from './pages/GradesPage';
 import SchedulePage from './pages/SchedulePage';
 import AnnouncementsPage from './pages/AnnouncementsPage';
 import CalendarPage from './pages/CalendarPage';
-import TimelinePage from './pages/TimelinePage';
+import TimelinePage from './pages/TimelinesPage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
