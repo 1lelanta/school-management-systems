@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { initializeDatabase } from './database';
+import { connectDatabase } from './database';
 import { seedDatabase } from './seeds/seed';
 import authRoutes from './routes/auth';
 import studentRoutes from './routes/students';
@@ -22,9 +22,21 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Initialize DB
-initializeDatabase();
-seedDatabase();
+// Initialize DB, seed and then start server
+async function start() {
+  try {
+    await connectDatabase();
+    await seedDatabase();
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error('Failed to start server:', err);
+    process.exit(1);
+  }
+}
+
+if (require.main === module) start();
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -41,11 +53,5 @@ app.use('/api/dashboard', dashboardRoutes);
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
-
-if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-}
 
 export default app;
