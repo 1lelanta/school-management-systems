@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { api } from '../utils/api';
 import { Class, AttendanceRecord } from '../types';
 import { Save, BarChart3 } from 'lucide-react';

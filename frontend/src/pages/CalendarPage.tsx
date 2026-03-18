@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { api } from '../utils/api';
 import { Event, Schedule } from '../types';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
