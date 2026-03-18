@@ -183,3 +183,16 @@ export async function seedDatabase(): Promise<void> {
 
   console.log('Database seeded successfully');
 }
+
+// If run directly, execute the seeder
+if (require.main === module) {
+  (async () => {
+    try {
+      await seedDatabase();
+      process.exit(0);
+    } catch (err) {
+      console.error('Seeding failed:', err);
+      process.exit(1);
+    }
+  })();
+}
