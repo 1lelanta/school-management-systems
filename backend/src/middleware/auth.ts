@@ -8,6 +8,9 @@ export interface AuthRequest extends Request {
   body?: any;
   // Ensure `headers` is available for middleware that reads authorization headers
   headers?: any;
+  // Ensure `params` and `query` are available for route handlers
+  params?: any;
+  query?: any;
 
   user?: {
     id: string;
