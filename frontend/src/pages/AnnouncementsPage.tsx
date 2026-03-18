@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { api } from '../utils/api';
 import { Announcement } from '../types';
-import { useAuth } from "../contexts/AuthContenxt";
+import { useAuth } from '../contexts/AuthContext';
 import { Plus, Megaphone, X } from 'lucide-react';
 
 export default function AnnouncementsPage() {
