@@ -1,20 +1,25 @@
-
-
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
-import db from '../database';
+import { connectDatabase } from '../database';
 
-export function seedDatabase(): void {
-  const userCount = (db.prepare('SELECT COUNT(*) as count FROM users').get() as any).count;
+export async function seedDatabase(): Promise<void> {
+  const db = await connectDatabase();
+  const userCount = await db.collection('users').countDocuments();
   if (userCount > 0) return;
 
   const hash = (pw: string) => bcrypt.hashSync(pw, 10);
 
   // Admin
   const adminId = uuidv4();
-  db.prepare('INSERT INTO users (id, email, password, role, first_name, last_name) VALUES (?, ?, ?, ?, ?, ?)').run(
-    adminId, 'admin@school.com', hash('admin123'), 'admin', 'Sarah', 'Johnson'
-  );
+  await db.collection('users').insertOne({
+    id: adminId,
+    email: 'admin@school.com',
+    password: hash('admin123'),
+    role: 'admin',
+    first_name: 'Sarah',
+    last_name: 'Johnson',
+    created_at: new Date(),
+  });
 
   // Teachers
   const teacherData = [
@@ -28,12 +33,8 @@ export function seedDatabase(): void {
   for (const t of teacherData) {
     const userId = uuidv4();
     const teacherId = uuidv4();
-    db.prepare('INSERT INTO users (id, email, password, role, first_name, last_name) VALUES (?, ?, ?, ?, ?, ?)').run(
-      userId, t.email, hash('teacher123'), 'teacher', t.first, t.last
-    );
-    db.prepare('INSERT INTO teachers (id, user_id, subject_specialization, contact_phone, office_hours) VALUES (?, ?, ?, ?, ?)').run(
-      teacherId, userId, t.subject, t.phone, t.office
-    );
+    await db.collection('users').insertOne({ id: userId, email: t.email, password: hash('teacher123'), role: 'teacher', first_name: t.first, last_name: t.last, created_at: new Date() });
+    await db.collection('teachers').insertOne({ id: teacherId, user_id: userId, subject_specialization: t.subject, contact_phone: t.phone, office_hours: t.office, created_at: new Date() });
     teachers.push({ id: teacherId, userId });
   }
 
@@ -49,9 +50,7 @@ export function seedDatabase(): void {
   const subjects: string[] = [];
   for (const s of subjectData) {
     const id = uuidv4();
-    db.prepare('INSERT INTO subjects (id, name, code, description, teacher_id) VALUES (?, ?, ?, ?, ?)').run(
-      id, s.name, s.code, s.desc, teachers[s.teacherIdx].id
-    );
+    await db.collection('subjects').insertOne({ id, name: s.name, code: s.code, description: s.desc, teacher_id: teachers[s.teacherIdx].id, created_at: new Date() });
     subjects.push(id);
   }
 
@@ -67,16 +66,14 @@ export function seedDatabase(): void {
   const classes: string[] = [];
   for (const c of classData) {
     const id = uuidv4();
-    db.prepare('INSERT INTO classes (id, name, grade_level, section, academic_year, room) VALUES (?, ?, ?, ?, ?, ?)').run(
-      id, c.name, c.grade, c.section, c.year, c.room
-    );
+    await db.collection('classes').insertOne({ id, name: c.name, grade_level: c.grade, section: c.section, academic_year: c.year, room: c.room, capacity: 30, created_at: new Date() });
     classes.push(id);
-    // Assign teachers and subjects
+    // Assign teachers and subjects (upsert to avoid duplicates)
     for (let i = 0; i < teachers.length; i++) {
-      db.prepare('INSERT OR IGNORE INTO class_teachers (class_id, teacher_id) VALUES (?, ?)').run(id, teachers[i].id);
+      await db.collection('class_teachers').updateOne({ class_id: id, teacher_id: teachers[i].id }, { $setOnInsert: { class_id: id, teacher_id: teachers[i].id } }, { upsert: true });
     }
     for (const subId of subjects) {
-      db.prepare('INSERT OR IGNORE INTO class_subjects (class_id, subject_id) VALUES (?, ?)').run(id, subId);
+      await db.collection('class_subjects').updateOne({ class_id: id, subject_id: subId }, { $setOnInsert: { class_id: id, subject_id: subId } }, { upsert: true });
     }
   }
 
@@ -104,16 +101,9 @@ export function seedDatabase(): void {
     const enrollDate = `${enrollYear}-0${1 + (i % 9)}-${10 + (i % 20)}`;
     const status = statuses[i % statuses.length];
 
-    db.prepare('INSERT INTO users (id, email, password, role, first_name, last_name) VALUES (?, ?, ?, ?, ?, ?)').run(
-      userId, email, hash('student123'), 'student', first, last
-    );
-    db.prepare(`INSERT INTO students (id, user_id, student_id_number, grade_class, enrollment_date, parent_name, parent_phone, parent_email, status, notes)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
-      studentId, userId, `STU-${(1000 + i).toString()}`, gradeClass, enrollDate,
-      `Parent of ${first}`, `555-${(2000 + i).toString()}`, `parent.${last.toLowerCase()}@email.com`,
-      status, i % 3 === 0 ? 'Honor roll student' : null
-    );
-    db.prepare('INSERT OR IGNORE INTO class_students (class_id, student_id) VALUES (?, ?)').run(classes[classIdx], studentId);
+    await db.collection('users').insertOne({ id: userId, email, password: hash('student123'), role: 'student', first_name: first, last_name: last, created_at: new Date() });
+    await db.collection('students').insertOne({ id: studentId, user_id: userId, student_id_number: `STU-${(1000 + i).toString()}`, grade_class: gradeClass, enrollment_date: enrollDate, parent_name: `Parent of ${first}`, parent_phone: `555-${(2000 + i).toString()}`, parent_email: `parent.${last.toLowerCase()}@email.com`, status, notes: i % 3 === 0 ? 'Honor roll student' : null, created_at: new Date() });
+    await db.collection('class_students').updateOne({ class_id: classes[classIdx], student_id: studentId }, { $setOnInsert: { class_id: classes[classIdx], student_id: studentId } }, { upsert: true });
     allStudents.push(studentId);
   }
 
@@ -126,10 +116,7 @@ export function seedDatabase(): void {
       for (let ti = 0; ti < Math.min(4, subjects.length); ti++) {
         const si = (ti + di + ci) % subjects.length;
         const tchi = (ti + ci) % teachers.length;
-        db.prepare(`INSERT INTO schedules (id, class_id, subject_id, teacher_id, day_of_week, start_time, end_time, room)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`).run(
-          uuidv4(), classes[ci], subjects[si], teachers[tchi].id, days[di], times[ti][0], times[ti][1], classData[ci].room
-        );
+        await db.collection('schedules').insertOne({ id: uuidv4(), class_id: classes[ci], subject_id: subjects[si], teacher_id: teachers[tchi].id, day_of_week: days[di], start_time: times[ti][0], end_time: times[ti][1], room: classData[ci].room, created_at: new Date() });
       }
     }
   }
@@ -146,10 +133,7 @@ export function seedDatabase(): void {
       const classIdx = si % classes.length;
       const rand = Math.random();
       const status = rand < 0.85 ? 'Present' : rand < 0.95 ? 'Late' : 'Absent';
-      db.prepare(`INSERT OR IGNORE INTO attendance (id, student_id, class_id, date, status, marked_by)
-        VALUES (?, ?, ?, ?, ?, ?)`).run(
-        uuidv4(), allStudents[si], classes[classIdx], dateStr, status, teachers[0].userId
-      );
+      await db.collection('attendance').updateOne({ student_id: allStudents[si], class_id: classes[classIdx], date: dateStr }, { $setOnInsert: { id: uuidv4(), student_id: allStudents[si], class_id: classes[classIdx], date: dateStr, status, marked_by: teachers[0].userId, created_at: new Date() } }, { upsert: true });
     }
   }
 
@@ -164,12 +148,7 @@ export function seedDatabase(): void {
       const date = new Date(today);
       date.setDate(date.getDate() - daysAgo);
 
-      db.prepare(`INSERT INTO grades (id, student_id, subject_id, class_id, type, title, score, max_score, graded_by, date)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
-        uuidv4(), studentId, subjects[subIdx], classes[classIdx],
-        gradeTypes[g % gradeTypes.length], `${gradeTypes[g % gradeTypes.length]} ${g + 1}`,
-        score, 100, teachers[subIdx % teachers.length].userId, date.toISOString().split('T')[0]
-      );
+      await db.collection('grades').insertOne({ id: uuidv4(), student_id: studentId, subject_id: subjects[subIdx], class_id: classes[classIdx], type: gradeTypes[g % gradeTypes.length], title: `${gradeTypes[g % gradeTypes.length]} ${g + 1}`, score, max_score: 100, graded_by: teachers[subIdx % teachers.length].userId, notes: null, date: date.toISOString().split('T')[0], created_at: new Date() });
     }
   }
 
@@ -183,9 +162,7 @@ export function seedDatabase(): void {
   ];
 
   for (const a of announcements) {
-    db.prepare('INSERT INTO announcements (id, title, content, author_id, target_role) VALUES (?, ?, ?, ?, ?)').run(
-      uuidv4(), a.title, a.content, adminId, a.target
-    );
+    await db.collection('announcements').insertOne({ id: uuidv4(), title: a.title, content: a.content, author_id: adminId, target_role: a.target, created_at: new Date() });
   }
 
   // Events
@@ -198,15 +175,11 @@ export function seedDatabase(): void {
   ];
 
   for (const e of events) {
-    db.prepare('INSERT INTO events (id, title, event_type, start_date, end_date, created_by) VALUES (?, ?, ?, ?, ?, ?)').run(
-      uuidv4(), e.title, e.type, e.start, e.end, adminId
-    );
+    await db.collection('events').insertOne({ id: uuidv4(), title: e.title, event_type: e.type, start_date: e.start, end_date: e.end, created_by: adminId, created_at: new Date() });
   }
 
   // Activity log
-  db.prepare('INSERT INTO activity_log (id, user_id, action, entity_type, details) VALUES (?, ?, ?, ?, ?)').run(
-    uuidv4(), adminId, 'system_init', 'system', 'School Management System initialized with seed data'
-  );
+  await db.collection('activity_log').insertOne({ id: uuidv4(), user_id: adminId, action: 'system_init', entity_type: 'system', details: 'School Management System initialized with seed data', created_at: new Date() });
 
   console.log('Database seeded successfully');
 }
