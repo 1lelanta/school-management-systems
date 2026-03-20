@@ -28,24 +28,21 @@ app.use((req, _res, next) => {
 });
 
 // Explicitly handle preflight OPTIONS to provide clear diagnostics when denied.
-app.options('*', (req, res, next) => {
-  const origin = req.headers.origin as string | undefined;
-  if (origin && !allowedOrigins.includes(origin)) {
-    console.warn('[CORS] Denied origin:', origin, 'Allowed:', allowedOrigins.join(','));
-    return res.status(403).json({ error: 'CORS origin denied', origin, allowed: allowedOrigins });
-  }
-  return next();
-});
-
+// Allow wildcard '*' or explicit origins. Rely on the `cors` middleware to
+// properly respond to OPTIONS preflight requests so the browser receives
+// the necessary Access-Control-Allow-* headers.
 app.use(cors({
   origin: (incomingOrigin, callback) => {
     // Allow non-browser requests with no origin (e.g., curl, server-to-server)
     if (!incomingOrigin) return callback(null, true);
+    // Allow wildcard
+    if (allowedOrigins.includes('*')) return callback(null, true);
     if (allowedOrigins.includes(incomingOrigin)) return callback(null, true);
     console.warn('[CORS] origin not permitted by cors middleware:', incomingOrigin);
     return callback(new Error('CORS origin denied'), false);
   },
-  credentials: true
+  credentials: true,
+  optionsSuccessStatus: 204
 }));
 app.use(express.json());
 
