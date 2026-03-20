@@ -20,11 +20,29 @@ const PORT = process.env.PORT || 5000;
 const rawOrigins = process.env.CORS_ORIGIN || 'http://localhost:5174';
 const allowedOrigins = rawOrigins.split(',').map(s => s.trim()).filter(Boolean);
 
+// Simple request logger for CORS debugging
+app.use((req, _res, next) => {
+  const incoming = req.headers.origin as string | undefined;
+  if (incoming) console.log('[CORS] incoming origin ->', incoming);
+  next();
+});
+
+// Explicitly handle preflight OPTIONS to provide clear diagnostics when denied.
+app.options('*', (req, res, next) => {
+  const origin = req.headers.origin as string | undefined;
+  if (origin && !allowedOrigins.includes(origin)) {
+    console.warn('[CORS] Denied origin:', origin, 'Allowed:', allowedOrigins.join(','));
+    return res.status(403).json({ error: 'CORS origin denied', origin, allowed: allowedOrigins });
+  }
+  return next();
+});
+
 app.use(cors({
   origin: (incomingOrigin, callback) => {
     // Allow non-browser requests with no origin (e.g., curl, server-to-server)
     if (!incomingOrigin) return callback(null, true);
     if (allowedOrigins.includes(incomingOrigin)) return callback(null, true);
+    console.warn('[CORS] origin not permitted by cors middleware:', incomingOrigin);
     return callback(new Error('CORS origin denied'), false);
   },
   credentials: true
