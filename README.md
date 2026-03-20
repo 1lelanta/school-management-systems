@@ -87,6 +87,14 @@ Frontend (Vercel)
 - Set `VITE_API_BASE` in Vercel Environment to `https://<your-backend>/api` (example: `https://school-management-systems-18w4.onrender.com/api`).
 - A `frontend/vercel.json` file is included to ensure static-build output and client-side routing fallback.
 
+Demo access
+- Live demo frontend: https://school-management-systems-ebon.vercel.app
+- Live demo backend: https://school-management-systems-18w4.onrender.com
+- To use the demo accounts from the frontend landing page, open the login page and use the Autofill buttons. Demo names are localized to Ethiopian names for presentation; underlying credentials (seeded emails/passwords) are:
+	- Admin (Bekele Tesfaye): `admin@school.com` / `admin123`
+	- Teacher (Almaz Kebede): `james.smith@school.com` / `teacher123`
+	- Student (Amanuel Bekele): `liam.anderson@student.school.com` / `student123`
+
 See the full deployment guide: [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ## CORS and common deployment pitfalls

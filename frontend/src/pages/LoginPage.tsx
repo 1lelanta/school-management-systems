@@ -92,17 +92,17 @@ export default function LoginPage() {
             <p style={{ fontWeight: 600, marginBottom: 6 }}>Demo Accounts:</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>Admin: admin@school.com / admin123</div>
+                <div>Admin (Bekele Tesfaye): admin@school.com / admin123</div>
                 <button className="btn btn-sm" onClick={() => setForm({ ...form, email: 'admin@school.com', password: 'admin123' })}>Autofill</button>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>Teacher: james.smith@school.com / teacher123</div>
+                <div>Teacher (Almaz Kebede): james.smith@school.com / teacher123</div>
                 <button className="btn btn-sm" onClick={() => setForm({ ...form, email: 'james.smith@school.com', password: 'teacher123' })}>Autofill</button>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>Student: liam.anderson@student.school.com / student123</div>
+                <div>Student (Amanuel Bekele): liam.anderson@student.school.com / student123</div>
                 <button className="btn btn-sm" onClick={() => setForm({ ...form, email: 'liam.anderson@student.school.com', password: 'student123' })}>Autofill</button>
               </div>
             </div>
