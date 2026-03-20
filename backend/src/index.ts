@@ -36,14 +36,23 @@ app.use(cors({
     // Allow non-browser requests with no origin (e.g., curl, server-to-server)
     if (!incomingOrigin) return callback(null, true);
     // Allow wildcard
-    if (allowedOrigins.includes('*')) return callback(null, true);
-    if (allowedOrigins.includes(incomingOrigin)) return callback(null, true);
-    console.warn('[CORS] origin not permitted by cors middleware:', incomingOrigin);
-    return callback(new Error('CORS origin denied'), false);
+      if (allowedOrigins.includes('*')) return callback(null, true);
+      if (allowedOrigins.includes(incomingOrigin)) return callback(null, true);
+      console.warn('[CORS] origin not permitted by cors middleware:', incomingOrigin);
+      // Do not pass an Error to the callback; pass (null, false) so the cors
+      // middleware will respond without throwing and without CORS headers.
+      return callback(null, false);
   },
   credentials: true,
   optionsSuccessStatus: 204
 }));
+
+// Generic error handler to avoid HTML error pages and make errors visible in JSON
+app.use((err: any, _req: any, res: any, _next: any) => {
+  console.error('[ERROR HANDLER]', err && err.stack ? err.stack : err);
+  const status = err && err.status ? err.status : 500;
+  res.status(status).json({ error: err && err.message ? err.message : 'Internal Server Error' });
+});
 app.use(express.json());
 
 // Initialize DB, seed and then start server
