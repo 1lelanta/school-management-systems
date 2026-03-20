@@ -5,28 +5,42 @@ import { connectDatabase } from '../database';
 export async function seedDatabase(): Promise<void> {
   const db = await connectDatabase();
   const userCount = await db.collection('users').countDocuments();
-  if (userCount > 0) return;
+  const force = process.env.FORCE_SEED === 'true';
+  if (userCount > 0 && !force) return;
+
+  if (force) {
+    // Drop collections used by the app to allow a fresh seed (safe for demo only)
+    const toDrop = ['users','students','teachers','subjects','classes','class_teachers','class_students','class_subjects','schedules','attendance','grades','announcements','events','activity_log'];
+    for (const name of toDrop) {
+      try {
+        const exists = await db.listCollections({ name }).hasNext();
+        if (exists) await db.collection(name).drop();
+      } catch (err) {
+        // ignore
+      }
+    }
+  }
 
   const hash = (pw: string) => bcrypt.hashSync(pw, 10);
 
-  // Admin
+  // Admin (Ethiopian demo name)
   const adminId = uuidv4();
   await db.collection('users').insertOne({
     id: adminId,
-    email: 'admin@school.com',
+    email: 'bekele.tesfaye@school.et',
     password: hash('admin123'),
     role: 'admin',
-    first_name: 'Sarah',
-    last_name: 'Johnson',
+    first_name: 'Bekele',
+    last_name: 'Tesfaye',
     created_at: new Date(),
   });
 
   // Teachers
   const teacherData = [
-    { first: 'James', last: 'Smith', email: 'james.smith@school.com', subject: 'Mathematics', phone: '555-0101', office: 'Mon/Wed 3-4 PM' },
-    { first: 'Maria', last: 'Garcia', email: 'maria.garcia@school.com', subject: 'Science', phone: '555-0102', office: 'Tue/Thu 2-3 PM' },
-    { first: 'Robert', last: 'Williams', email: 'robert.williams@school.com', subject: 'English', phone: '555-0103', office: 'Mon/Fri 1-2 PM' },
-    { first: 'Emily', last: 'Chen', email: 'emily.chen@school.com', subject: 'History', phone: '555-0104', office: 'Wed/Fri 3-4 PM' },
+    { first: 'Almaz', last: 'Kebede', email: 'almaz.kebede@school.et', subject: 'Mathematics', phone: '555-0101', office: 'Mon/Wed 3-4 PM' },
+    { first: 'Getachew', last: 'Bekele', email: 'getachew.bekele@school.et', subject: 'Science', phone: '555-0102', office: 'Tue/Thu 2-3 PM' },
+    { first: 'Marta', last: 'Alem', email: 'marta.alem@school.et', subject: 'English', phone: '555-0103', office: 'Mon/Fri 1-2 PM' },
+    { first: 'Yared', last: 'Tesfaye', email: 'yared.tesfaye@school.et', subject: 'History', phone: '555-0104', office: 'Wed/Fri 3-4 PM' },
   ];
 
   const teachers: { id: string; userId: string }[] = [];
@@ -94,7 +108,7 @@ export async function seedDatabase(): Promise<void> {
     const [first, last] = studentNames[i].split(' ');
     const userId = uuidv4();
     const studentId = uuidv4();
-    const email = `${first.toLowerCase()}.${last.toLowerCase()}@student.school.com`;
+    const email = `${first.toLowerCase()}.${last.toLowerCase()}@student.school.et`;
     const classIdx = i % classes.length;
     const gradeClass = classData[classIdx].name;
     const enrollYear = 2023 + (i % 3);

@@ -91,9 +91,9 @@ Demo access
 - Live demo frontend: https://school-management-systems-ebon.vercel.app
 - Live demo backend: https://school-management-systems-18w4.onrender.com
 - To use the demo accounts from the frontend landing page, open the login page and use the Autofill buttons. Demo names are localized to Ethiopian names for presentation; underlying credentials (seeded emails/passwords) are:
-	- Admin (Bekele Tesfaye): `admin@school.com` / `admin123`
-	- Teacher (Almaz Kebede): `james.smith@school.com` / `teacher123`
-	- Student (Amanuel Bekele): `liam.anderson@student.school.com` / `student123`
+	- Admin (Bekele Tesfaye): `bekele.tesfaye@school.et` / `admin123`
+	- Teacher (Almaz Kebede): `almaz.kebede@school.et` / `teacher123`
+	- Student (Amanuel Bekele): `amanuel.bekele@student.school.et` / `student123`
 
 See the full deployment guide: [DEPLOYMENT.md](DEPLOYMENT.md)
 

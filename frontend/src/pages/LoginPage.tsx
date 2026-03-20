@@ -93,17 +93,17 @@ export default function LoginPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>Admin (Bekele Tesfaye): admin@school.com / admin123</div>
-                <button className="btn btn-sm" onClick={() => setForm({ ...form, email: 'admin@school.com', password: 'admin123' })}>Autofill</button>
+                <button className="btn btn-sm" onClick={() => setForm({ ...form, email: 'bekele.tesfaye@school.et', password: 'admin123' })}>Autofill</button>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>Teacher (Almaz Kebede): james.smith@school.com / teacher123</div>
-                <button className="btn btn-sm" onClick={() => setForm({ ...form, email: 'james.smith@school.com', password: 'teacher123' })}>Autofill</button>
+                <button className="btn btn-sm" onClick={() => setForm({ ...form, email: 'almaz.kebede@school.et', password: 'teacher123' })}>Autofill</button>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>Student (Amanuel Bekele): liam.anderson@student.school.com / student123</div>
-                <button className="btn btn-sm" onClick={() => setForm({ ...form, email: 'liam.anderson@student.school.com', password: 'student123' })}>Autofill</button>
+                <button className="btn btn-sm" onClick={() => setForm({ ...form, email: 'amanuel.bekele@student.school.et', password: 'student123' })}>Autofill</button>
               </div>
             </div>
           </div>
