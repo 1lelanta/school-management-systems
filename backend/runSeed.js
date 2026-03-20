@@ -19,7 +19,7 @@ async function run() {
     const hash = (pw) => bcrypt.hashSync(pw, 10);
 
     const adminId = uuidv4();
-    await db.collection('users').insertOne({ id: adminId, email: 'bekele.tesfaye@school.et', password: hash('admin123'), role: 'admin', first_name: 'Bekele', last_name: 'Tesfaye', created_at: new Date() });
+    await db.collection('users').insertOne({ id: adminId, email: 'admin@gmail.com', password: hash('admin123'), role: 'admin', first_name: 'Bekele', last_name: 'Tesfaye', created_at: new Date() });
 
     const teacherUserId = uuidv4();
     const teacherId = uuidv4();

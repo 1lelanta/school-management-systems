@@ -27,7 +27,7 @@ export async function seedDatabase(): Promise<void> {
   const adminId = uuidv4();
   await db.collection('users').insertOne({
     id: adminId,
-    email: 'bekele.tesfaye@school.et',
+    email: 'admin@gmail.com',
     password: hash('admin123'),
     role: 'admin',
     first_name: 'Bekele',
