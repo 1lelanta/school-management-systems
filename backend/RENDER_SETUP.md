@@ -39,6 +39,14 @@ Notes on `PORT`:
 - If preflight returns `204` with `Access-Control-Allow-Origin` header set to your Vercel origin (or `*`), the CORS check is passing.
 - If you still see `500` or missing CORS headers, check logs for `[ERROR HANDLER]` and `[CORS] incoming origin -> ...` and paste them for help.
 
+6) Reseeding demo data
+- The seeder supports a forced reseed by setting the env var `FORCE_SEED=true`. When set, the seeder will drop the app collections and insert fresh demo data.
+- To perform a forced reseed on Render:
+  - Set `FORCE_SEED=true` in the service Environment.
+  - Deploy/restart the service so the seeder runs on startup (the app calls `seedDatabase()` during startup).
+  - After the seed completes, remove `FORCE_SEED` or set it to false to avoid accidental drops.
+
+
 5) Security reminders
 - Do not commit real credentials. Use `backend/.env.production.example` as a template and set real values in Render.
 - Prefer explicit origins over `*` in production.
