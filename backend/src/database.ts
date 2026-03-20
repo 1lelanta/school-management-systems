@@ -8,10 +8,18 @@ let db: Db | null = null;
 
 export async function connectDatabase(): Promise<Db> {
   if (db) return db;
-  await client.connect();
-  db = client.db(dbName);
-  await initializeDatabase(db);
-  return db;
+  try {
+    await client.connect();
+    db = client.db(dbName);
+    await initializeDatabase(db);
+    return db;
+  } catch (err: any) {
+    console.error('Failed to connect to MongoDB');
+    console.error('MONGO_URI present:', !!process.env.MONGO_URI);
+    console.error('MONGO_DB_NAME:', process.env.MONGO_DB_NAME || dbName);
+    console.error('Error message:', err.message || err);
+    throw err;
+  }
 }
 
 export async function initializeDatabase(database?: Db): Promise<void> {

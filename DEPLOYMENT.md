@@ -37,6 +37,29 @@ Notes
 - For production on a server, replace the `env_file` in `docker-compose.yml` with your secure `.env` path or inject secrets via your orchestrator.
 - Frontend expects `VITE_API_BASE` to point to the backend (example: `https://api.mydomain.com/api`).
 
+MongoDB / Atlas notes
+- If you use MongoDB Atlas, ensure your cluster's IP Access List allows connections from Render's outbound IPs. Render does not provide fixed outbound IPs for all plans — the simplest option for testing is to temporarily allow 0.0.0.0/0 (not recommended for production) or use VPC peering/Private Networking with Render.
+- Common Atlas errors on deploy:
+	- `Authentication failed` — check credentials in `MONGO_URI` and ensure the user exists.
+	- `DNS resolution` or `getaddrinfo ENOTFOUND` — check that `mongodb+srv://` SRV DNS lookups are allowed; Render should support this but verify DNS.
+	- `connection timed out` — likely network/IP whitelist issue.
+- Debugging tip: add the `scripts/test-mongo.js` file in `backend/scripts` and run it in Render's Deploy Shell or as a one-off command with the same env vars to see detailed errors:
+
+```bash
+# from repo root, run inside Render's shell or locally with env vars set
+node backend/scripts/test-mongo.js
+```
+
+Vercel (frontend) quick steps
+- In Vercel project settings, set an environment variable `VITE_API_BASE` to `https://school-management-systems-18w4.onrender.com/api` for the Production environment.
+- Build command: `npm run build` (Vercel will detect and run in `frontend` if you set the project root to `frontend` or create a Vercel project using that folder).
+- Output directory: `dist`
+- You can add a `vercel.json` if you want to set headers/rewrites, but usually setting `VITE_API_BASE` in the dashboard is sufficient.
+
+If you'd like, I can:
+- Add a `vercel.json` and a short `frontend/README.md` with deployment steps.
+- Try a one-off Render shell run of `node backend/scripts/test-mongo.js` if you provide the Render deploy log output or allow me to run commands (I cannot run on Render but can guide exact steps).
+
 Render.com notes
 - If deploying the backend on Render, set these Render service settings:
 	- **Build Command:** `npm run build`
