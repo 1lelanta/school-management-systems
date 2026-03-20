@@ -19,11 +19,11 @@ async function run() {
     const hash = (pw) => bcrypt.hashSync(pw, 10);
 
     const adminId = uuidv4();
-    await db.collection('users').insertOne({ id: adminId, email: 'admin@school.com', password: hash('admin123'), role: 'admin', first_name: 'Sarah', last_name: 'Johnson', created_at: new Date() });
+    await db.collection('users').insertOne({ id: adminId, email: 'bekele.tesfaye@school.et', password: hash('admin123'), role: 'admin', first_name: 'Bekele', last_name: 'Tesfaye', created_at: new Date() });
 
     const teacherUserId = uuidv4();
     const teacherId = uuidv4();
-    await db.collection('users').insertOne({ id: teacherUserId, email: 'james.smith@school.com', password: hash('teacher123'), role: 'teacher', first_name: 'James', last_name: 'Smith', created_at: new Date() });
+    await db.collection('users').insertOne({ id: teacherUserId, email: 'almaz.kebede@school.et', password: hash('teacher123'), role: 'teacher', first_name: 'Almaz', last_name: 'Kebede', created_at: new Date() });
     await db.collection('teachers').insertOne({ id: teacherId, user_id: teacherUserId, subject_specialization: 'Mathematics', contact_phone: '555-0101', office_hours: 'Mon/Wed 3-4 PM', created_at: new Date() });
 
     const subjectId = uuidv4();
@@ -36,7 +36,7 @@ async function run() {
 
     const studentUserId = uuidv4();
     const studentId = uuidv4();
-    await db.collection('users').insertOne({ id: studentUserId, email: 'liam.anderson@student.school.com', password: hash('student123'), role: 'student', first_name: 'Liam', last_name: 'Anderson', created_at: new Date() });
+    await db.collection('users').insertOne({ id: studentUserId, email: 'amanuel.bekele@student.school.et', password: hash('student123'), role: 'student', first_name: 'Amanuel', last_name: 'Bekele', created_at: new Date() });
     await db.collection('students').insertOne({ id: studentId, user_id: studentUserId, student_id_number: 'STU-1001', grade_class: 'Grade 9-A', enrollment_date: new Date().toISOString().split('T')[0], parent_name: 'Parent of Liam', parent_phone: '555-2000', parent_email: 'parent.anderson@email.com', status: 'Active', created_at: new Date() });
     await db.collection('class_students').insertOne({ class_id: classId, student_id: studentId });
 
