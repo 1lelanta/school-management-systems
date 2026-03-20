@@ -1,0 +1,10 @@
+# Example .npmrc for Render or other CI when you need to authenticate to private
+# registries. Do NOT commit real tokens — set them in your Render service ENV vars
+# and reference them here, or add the file via Render's dashboard.
+
+# Use an npm token stored in the environment (RENDER_NPM_TOKEN or NPM_TOKEN)
+//registry.npmjs.org/:_authToken=${NPM_TOKEN}
+
+# If you use a private GitHub Packages registry, example:
+@my-org:registry=https://npm.pkg.github.com/
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
