@@ -27,6 +27,26 @@ app.use((req, _res, next) => {
   next();
 });
 
+// Log allowed origins at startup for debugging
+console.log('[CORS] allowed origins ->', allowedOrigins.join(','));
+
+// Explicitly handle OPTIONS preflight for API routes to ensure we return
+// the necessary Access-Control-Allow-* headers even if the cors middleware
+// later fails for some reason. This returns 204 with appropriate headers.
+app.options('/api/*', (req, res) => {
+  const origin = req.headers.origin as string | undefined;
+  if (!origin) return res.sendStatus(204);
+  if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', allowedOrigins.includes('*') ? '*' : origin);
+    res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    return res.sendStatus(204);
+  }
+  // Deny with 403 and JSON to make the response clear to debugging tools
+  return res.status(403).json({ error: 'CORS origin denied', origin, allowed: allowedOrigins });
+});
+
 // Explicitly handle preflight OPTIONS to provide clear diagnostics when denied.
 // Allow wildcard '*' or explicit origins. Rely on the `cors` middleware to
 // properly respond to OPTIONS preflight requests so the browser receives
