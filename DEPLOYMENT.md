@@ -56,6 +56,15 @@ Vercel (frontend) quick steps
 - Output directory: `dist`
 - You can add a `vercel.json` if you want to set headers/rewrites, but usually setting `VITE_API_BASE` in the dashboard is sufficient.
 
+Vercel recommended config
+- Project Root: `frontend`
+- Framework Preset: `Other` (or leave auto-detect)
+- Build Command: `npm install && npm run build`
+- Output Directory: `dist`
+- Environment (Production): set `VITE_API_BASE` = `https://school-management-systems-18w4.onrender.com/api`
+
+This repo includes `frontend/vercel.json` to enforce a static-build deploy and a fallback route for client-side routing.
+
 If you'd like, I can:
 - Add a `vercel.json` and a short `frontend/README.md` with deployment steps.
 - Try a one-off Render shell run of `node backend/scripts/test-mongo.js` if you provide the Render deploy log output or allow me to run commands (I cannot run on Render but can guide exact steps).
