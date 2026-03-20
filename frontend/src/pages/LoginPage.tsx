@@ -92,8 +92,8 @@ export default function LoginPage() {
             <p style={{ fontWeight: 600, marginBottom: 6 }}>Demo Accounts:</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>Admin (Bekele Tesfaye): bekele.tesfaye@school.et / admin123</div>
-                <button className="btn btn-sm" onClick={() => setForm({ ...form, email: 'bekele.tesfaye@school.et', password: 'admin123' })}>Autofill</button>
+                <div>Admin (Bekele Tesfaye): admin@gmail.com / admin123</div>
+                <button className="btn btn-sm" onClick={() => setForm({ ...form, email: 'admin@gmail.com', password: 'admin123' })}>Autofill</button>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
